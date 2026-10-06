@@ -2,12 +2,12 @@
 
 A Django REST Framework backend for an e-commerce flow: product listing, guest-friendly cart, JWT auth, and Stripe Checkout payment with webhook-confirmed stock management.
 
-## Live demo
+<!-- ## Live demo
 
 API base URL: `https://your-app.onrender.com/api/`
 Interactive docs (Swagger): `https://your-app.onrender.com/docs/`
 
-> Free-tier hosting — first request after inactivity may take ~30s to wake up.
+> Free-tier hosting — first request after inactivity may take ~30s to wake up. -->
 
 ## Features
 
