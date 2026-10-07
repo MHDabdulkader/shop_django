@@ -21,3 +21,5 @@ python manage.py migrate
 pip install drf-spectacular
 
 
+python manage.py test shop -v 2
+
