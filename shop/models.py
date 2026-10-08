@@ -14,6 +14,8 @@ class Product(models.Model):
     image = models.ImageField(upload_to="products/", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    is_featured = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-created_at"] # ! check other sort need ordering?
@@ -64,3 +66,49 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=2)
     qty = models.PositiveIntegerField()
 
+
+
+# * Package and subscription:
+class Package(models.Model):
+    INTERVALS = [("month", "Monthly"), ("year", "Yearly")]
+    
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    interval = models.CharField(max_length=8, choices=INTERVALS, default="month")
+    is_active = models.BooleanField(default=True) # * Change via admin
+    
+    # * Features (practice limits)
+    max_products = models.PositiveIntegerField(default=5)
+    max_stock_per_product = models.PositiveIntegerField(default=50)
+    can_feature_products = models.BooleanField(default=False)
+    
+    # * filled automatically by admin sync
+    stripe_product_id = models.CharField(max_length=100, blank=True, editable=False)
+    stripe_price_id = models.CharField(max_length=100, blank=True, editable=False)
+    
+    def __str__(self) -> str:
+        return f"{self.name} ({self.price}/{self.interval})"
+    
+class Subscription(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="subscription")
+    package = models.ForeignKey(Package, on_delete=models.PROTECT)
+    stripe_customer_id = models.CharField(max_length=100)
+    stripe_subscription_id = models.CharField(max_length=100)
+    status = models.CharField(max_length=100) # * active, trialing, past_due, cancelled
+    current_period_end = models.DateTimeField(null=True, blank=True)
+    cancel_at_period_end = models.BooleanField(default=False)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    @property
+    def is_active(self):
+        return self.status in ("active", "trialing")
+    
+    
+def active_package(user):
+    sub = getattr(user, "subscription", None)
+    return sub.package if sub and sub.is_active else None
+
+
+    
