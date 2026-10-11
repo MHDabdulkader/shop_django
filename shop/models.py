@@ -16,6 +16,9 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     is_featured = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         ordering = ["-created_at"] # ! check other sort need ordering?
@@ -55,6 +58,9 @@ class Order(models.Model):
 
     stripe_session_id = models.CharField(max_length=255, blank=True)
 
+    def __str__(self):
+        return f"Order #{self.pk}"
+
     class Meta:
         ordering = ["-created_at"]
 
@@ -65,6 +71,9 @@ class OrderItem(models.Model):
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=12, decimal_places=2)
     qty = models.PositiveIntegerField()
+    
+    def __str__(self) -> str:
+        return f"{self.qty} x {self.product} (Order #{self.order.pk})"
 
 
 
